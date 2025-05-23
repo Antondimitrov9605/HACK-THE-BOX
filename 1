@@ -1,0 +1,26 @@
+import requests
+import json
+
+# 🔄 АКТУАЛЕН IP от новата VM
+url = "http://10.129.232.138:8002/api/upload"
+
+# Път към модела
+model_file_path = "malware_classifier.pth"
+
+try:
+    with open(model_file_path, "rb") as model_file:
+        files = {"model": model_file}
+        print(f"[*] Uploading model to {url} ...")
+        response = requests.post(url, files=files, timeout=20)
+
+        try:
+            result = response.json()
+            print(json.dumps(result, indent=4))
+        except json.JSONDecodeError:
+            print("[!] Server did not return valid JSON.")
+            print(response.text)
+
+except FileNotFoundError:
+    print(f"[!] Model file not found: {model_file_path}")
+except requests.exceptions.RequestException as e:
+    print(f"[!] Request failed: {e}")
